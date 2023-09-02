@@ -1,10 +1,26 @@
 class GFPolynomial:
-    def _init_(self, coeffs: list):
+    def __init__(self, coeffs: list):
         self.degree = len(coeffs)
         self.coeffs = coeffs
         self.irrd_poly_coeff = [1, 0, 0, 0, 1, 1, 1, 1, 0]
 
-    def _repr_(self):
+    @staticmethod
+    def _typecheck(p1, p2):
+        if isinstance(p2, int):
+            p2 = GFPolynomial([0] * (p1.degree - 1) + [p2])
+
+        elif isinstance(p2, GFPolynomial):
+            if p1.degree > p2.degree:
+                p2.coeffs = [0] * (p1.degree - p2.degree) + p2.coeffs
+            elif p2.degree > p1.degree:
+                p1.coeffs = [0] * (p2.degree - p1.degree) + p1.coeffs
+
+        elif not isinstance(p2, GFPolynomial):
+            raise TypeError
+
+        return p1, p2
+
+    def __repr__(self):
         poly = []
         for i, coeff in enumerate(self.coeffs[::-1]):
             if coeff == 0:
@@ -22,27 +38,17 @@ class GFPolynomial:
 
         return (" + ").join(poly[::-1])
 
-    def _add_(self, other):
-        if isinstance(other, int):
-            other = GFPolynomial([0] * (self.degree - 1) + [other])
+    def __add__(self, other):
+        p1, p2 = self._typecheck(self, other)
 
-        elif isinstance(other, GFPolynomial):
-            if self.degree > other.degree:
-                other.coeffs = [0] * (self.degree - other.degree) + other.coeffs
-            elif other.degree > self.degree:
-                self.coeffs = [0] * (other.degree - self.degree) + self.coeffs
+        result = []
+        for i in range(len(p1.coeffs)):
+            result.append(abs(p1.coeffs[i]) ^ abs(p2.coeffs[i]))
 
-        elif not isinstance(other, GFPolynomial):
-            raise TypeError
+        return GFPolynomial(result)
 
-        resultant_coeffs = []
-        for i in range(len(self.coeffs)):
-            resultant_coeffs.append(abs(self.coeffs[i]) ^ abs(other.coeffs[i]))
-
-        return GFPolynomial(resultant_coeffs)
-
-    def _sub_(self, other):
+    def __sub__(self, other):
         return self._add_(other)
 
-    def _mul_(self, other):
+    def __mul__(self, other):
         pass
