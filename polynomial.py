@@ -26,6 +26,8 @@ class GFPolynomial:
 
     @staticmethod
     def gf_multiply(c1, c2):
+        if 0 in [c1, c2]:
+            return 0
         return lookup_antilog[(lookup_log[c1] + lookup_log[c2]) % 255]
 
     def __repr__(self):
@@ -63,9 +65,29 @@ class GFPolynomial:
 
         for i in range(self.degree + 1):
             for j in range(other.degree + 1):
-                result[i+j] ^= self.gf_multiply(self.coeffs[i], other.coeffs[j])
+                if 0 not in [self.coeffs[i], other.coeffs[j]]:
+                    result[i+j] ^= self.gf_multiply(self.coeffs[i], other.coeffs[j])
 
         return GFPolynomial(result)
+
+    def __mod__(self, other):
+        # Assumes `other` is a monic polynomial.
+        if self.degree <= other.degree:
+            return 0, other
+
+        diff = (self.degree - other.degree)
+        dividend = self.coeffs
+
+        for _ in range(diff+1):
+            divisor = other.coeffs + [0] * diff
+            temp = [self.gf_multiply(dividend[0], d) for d in divisor]
+            dividend = (GFPolynomial(dividend) - GFPolynomial(temp)).coeffs[1:]
+            diff -= 1
+
+        return dividend
+
+
+
 
 
 
