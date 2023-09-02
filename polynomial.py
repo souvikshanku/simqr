@@ -87,10 +87,6 @@ class GFPolynomial:
         return dividend
 
 
-
-
-
-
 if __name__ == "__main__":
     res = GFPolynomial([1, 1])
 
