@@ -1,6 +1,6 @@
 TODO
 ----
-* Galois Field Polynomial
+* Galois Field Polynomial ✅
 * Reed-Solomon Implementation
 * QR generation
 

@@ -1,4 +1,4 @@
-values = [
+VALUES = [
     1,2,4,8,16,32,64,128,29,58,116,232,205,
     135,19,38,76,152,45,90,180,117,234,201,
     143,3,6,12,24,48,96,192,157,39,78,156,
@@ -22,5 +22,11 @@ values = [
     233,207,131,27,54,108,216,173,71,142,1
 ]
 
-lookup_log = dict(zip(values, range(len(values))))
-lookup_antilog = dict(zip(range(len(values)), values))
+LOG_LOOKUP = dict(zip(VALUES, range(len(VALUES))))
+ANTILOG_LOOKUP = dict(zip(range(len(VALUES)), VALUES))
+
+
+def gf_multiply(c1, c2):
+    if 0 in [c1, c2]:
+        return 0
+    return ANTILOG_LOOKUP[(LOG_LOOKUP[c1] + LOG_LOOKUP[c2]) % 255]

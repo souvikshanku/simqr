@@ -1,4 +1,4 @@
-from utils import lookup_log, lookup_antilog
+from utils import gf_multiply
 
 
 class GFPolynomial:
@@ -9,7 +9,7 @@ class GFPolynomial:
         self.irrd_poly_coeff = [1, 0, 0, 0, 1, 1, 1, 1, 0]
 
     @staticmethod
-    def _typecheck(p1, p2):
+    def typecheck(p1, p2):
         if isinstance(p2, int):
             p2 = GFPolynomial([0] * p1.degree + [p2])
 
@@ -23,12 +23,6 @@ class GFPolynomial:
             raise TypeError
 
         return p1, p2
-
-    @staticmethod
-    def gf_multiply(c1, c2):
-        if 0 in [c1, c2]:
-            return 0
-        return lookup_antilog[(lookup_log[c1] + lookup_log[c2]) % 255]
 
     def __repr__(self):
         poly = []
@@ -49,7 +43,7 @@ class GFPolynomial:
         return (" + ").join(poly[::-1])
 
     def __add__(self, other):
-        p1, p2 = self._typecheck(self, other)
+        p1, p2 = self.typecheck(self, other)
 
         result = []
         for i in range(len(p1.coeffs)):
@@ -66,7 +60,7 @@ class GFPolynomial:
         for i in range(self.degree + 1):
             for j in range(other.degree + 1):
                 if 0 not in [self.coeffs[i], other.coeffs[j]]:
-                    result[i+j] ^= self.gf_multiply(self.coeffs[i], other.coeffs[j])
+                    result[i+j] ^= gf_multiply(self.coeffs[i], other.coeffs[j])
 
         return GFPolynomial(result)
 
@@ -80,7 +74,7 @@ class GFPolynomial:
 
         for _ in range(diff+1):
             divisor = other.coeffs + [0] * diff
-            temp = [self.gf_multiply(dividend[0], d) for d in divisor]
+            temp = [gf_multiply(dividend[0], d) for d in divisor]
             dividend = (GFPolynomial(dividend) - GFPolynomial(temp)).coeffs[1:]
             diff -= 1
 
