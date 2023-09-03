@@ -29,4 +29,6 @@ ANTILOG_LOOKUP = dict(zip(range(len(VALUES)), VALUES))
 def gf_multiply(c1, c2):
     if 0 in [c1, c2]:
         return 0
+    elif max(c1, c2) > 255:
+        raise ValueError
     return ANTILOG_LOOKUP[(LOG_LOOKUP[c1] + LOG_LOOKUP[c2]) % 255]
