@@ -6,7 +6,6 @@ class GFPolynomial:
         # All coeffecients are assumed to be in [0, 255]
         self.degree = len(coeffs) - 1
         self.coeffs = coeffs
-        self.irrd_poly_coeff = [1, 0, 0, 0, 1, 1, 1, 1, 0]
 
     @staticmethod
     def typecheck(p1, p2):
@@ -66,8 +65,8 @@ class GFPolynomial:
 
     def __mod__(self, other):
         # Assumes `other` is a monic polynomial.
-        if self.degree <= other.degree:
-            return 0, other
+        if self.degree < other.degree:
+            return other
 
         diff = (self.degree - other.degree)
         dividend = self.coeffs

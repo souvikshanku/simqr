@@ -1,3 +1,4 @@
+# GF(256) list is taken from https://math.stackexchange.com/a/1069956
 VALUES = [
     1,2,4,8,16,32,64,128,29,58,116,232,205,
     135,19,38,76,152,45,90,180,117,234,201,
@@ -26,9 +27,40 @@ LOG_LOOKUP = dict(zip(VALUES, range(len(VALUES))))
 ANTILOG_LOOKUP = dict(zip(range(len(VALUES)), VALUES))
 
 
+VERSION1 = {
+    "H": [9, 17],
+    "Q": [13, 13],
+    "M": [16, 10],
+    "L": [19, 7],
+}
+
+
+class MessageTooLong(Exception):
+    pass
+
+
 def gf_multiply(c1, c2):
     if 0 in [c1, c2]:
         return 0
     elif max(c1, c2) > 255:
         raise ValueError
     return ANTILOG_LOOKUP[(LOG_LOOKUP[c1] + LOG_LOOKUP[c2]) % 255]
+
+
+def find_cw_lengths(message):
+    length = len(message)
+
+    limits = {}
+    for level in VERSION1:
+        limits[level] = ((VERSION1[level][0] * 8) - (4 + 8)) // 8
+
+    for level in VERSION1:
+        if length <= limits[level]:
+            return VERSION1[level]
+
+    raise MessageTooLong
+
+
+def expand_to_8_bits(binary_str):
+    prefix = "0" * (8 - len(binary_str[2:]))
+    return prefix + binary_str[2:]
