@@ -78,12 +78,3 @@ class GFPolynomial:
             diff -= 1
 
         return dividend
-
-
-if __name__ == "__main__":
-    res = GFPolynomial([1, 1])
-
-    for i in range(1, 7):
-        res *= GFPolynomial([1, 2**i])
-
-    print(res)
