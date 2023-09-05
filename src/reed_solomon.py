@@ -1,5 +1,5 @@
 from polynomial import GFPolynomial
-from utils import ANTILOG_LOOKUP, expand_to_8_bits, find_cw_lengths
+from utils import ANTILOG_LOOKUP, expand, find_cw_lengths
 
 
 def _generator_polynomial(degree):
@@ -37,18 +37,33 @@ def encode(message: str):
     len1, len2 = find_cw_lengths(message)
 
     byte_encoding_id = "0100"
-    msg_len = expand_to_8_bits(bin(len(message)))
-    msg_bin = "".join([expand_to_8_bits(bin(num)) for num in message])
+    msg_len = expand(bin(len(message)))
+    msg_bin = "".join([expand(bin(num)) for num in message])
 
     msg_bits = byte_encoding_id + msg_len + msg_bin
     msg_bits = _pad(msg_bits, len1)
 
     msg_poly_coeffs = _generate_message_poly(msg_bits)
 
-    message_poly = GFPolynomial(msg_poly_coeffs) * GFPolynomial([1] + [0] * len2)
+    msg_poly = GFPolynomial(msg_poly_coeffs) * GFPolynomial([1] + [0] * len2)
     gen_poly = _generator_polynomial(len2)
-    remainder = message_poly % gen_poly
-    
-    enc_msg = msg_bits + "".join([expand_to_8_bits(bin(r)) for r in remainder])
+    remainder = msg_poly % gen_poly
+
+    enc_msg = msg_bits + "".join([expand(bin(r)) for r in remainder])
 
     return enc_msg
+
+def encode_format_info(ec_level):
+    ec = {"L": [0, 1], "M": [0, 0], "Q": [1, 1], "H": [1, 0]}
+
+    mask = [0, 0, 0]  # Always choose mask pattern 0, kinda cheating.
+
+    poly = GFPolynomial(ec[ec_level] + mask) * GFPolynomial([1] + [0] * 10)
+    gen_poly = GFPolynomial([1, 0, 1, 0, 0, 1, 1, 0, 1, 1, 1])
+
+    rem = poly % gen_poly
+
+    f1 = int("".join(map(str, ec[ec_level] + mask + rem)), base=2)
+    f2 = int("101010000010010", base=2)
+
+    return expand(bin(f1 ^ f2), num_bits=15)

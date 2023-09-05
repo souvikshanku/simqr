@@ -61,6 +61,6 @@ def find_cw_lengths(message):
     raise MessageTooLong
 
 
-def expand_to_8_bits(binary_str):
-    prefix = "0" * (8 - len(binary_str[2:]))
+def expand(binary_str, num_bits=8):
+    prefix = "0" * (num_bits - len(binary_str[2:]))
     return prefix + binary_str[2:]
