@@ -1,66 +1,178 @@
-# GF(256) list is taken from https://math.stackexchange.com/a/1069956
-VALUES = [
-    1,2,4,8,16,32,64,128,29,58,116,232,205,
-    135,19,38,76,152,45,90,180,117,234,201,
-    143,3,6,12,24,48,96,192,157,39,78,156,
-    37,74,148,53,106,212,181,119,238,193,159,
-    35,70,140,5,10,20,40,80,160,93,186,105,210,
-    185,111,222,161,95,190,97,194,153,47,94,
-    188,101,202,137,15,30,60,120,240,253,231,
-    211,187,107,214,177,127,254,225,223,163,91,
-    182,113,226,217,175,67,134,17,34,68,136,13,
-    26,52,104,208,189,103,206,129,31,62,124,248,
-    237,199,147,59,118,236,197,151,51,102,204,133,
-    23,46,92,184,109,218,169,79,158,33,66,132,21,
-    42,84,168,77,154,41,82,164,85,170,73,146,57,114,
-    228,213,183,115,230,209,191,99,198,145,63,126,
-    252,229,215,179,123,246,241,255,227,219,171,75,
-    150,49,98,196,149,55,110,220,165,87,174,65,130,
-    25,50,100,200,141,7,14,28,56,112,224,221,167,
-    83,166,81,162,89,178,121,242,249,239,195,155,43,
-    86,172,69,138,9,18,36,72,144,61,122,244,245,247,
-    243,251,235,203,139,11,22,44,88,176,125,250,
-    233,207,131,27,54,108,216,173,71,142,1
-]
-
-LOG_LOOKUP = dict(zip(VALUES, range(len(VALUES))))
-ANTILOG_LOOKUP = dict(zip(range(len(VALUES)), VALUES))
+import numpy as np
+import matplotlib.pyplot as plt
 
 
-VERSION1 = {
-    "H": [9, 17],
-    "Q": [13, 13],
-    "M": [16, 10],
-    "L": [19, 7],
-}
+def fill_square_border(grid, corner1, corner2, value=1):
+    """
+      A +--+--+--+--+  D
+        |           | 
+        +           +
+        |           |
+      B +--+--+--+--+  C
+    """
+    size = corner2[0] - corner1[0]
+    # side AD
+    for i in range(size + 1):
+        grid[corner1[0], corner1[1] + i] = value
+    # side BC
+    for i in range(size):
+        grid[corner2[0], corner2[1] - i] = value
+    # side AB
+    for i in range(size + 1):
+        grid[corner1[0] + i, corner1[1]] = value
+    # side CD
+    for i in range(size):
+        grid[corner2[0] - i , corner2[1]] = value
+
+    return grid
+
+def fill_squares(grid, corner1, size):
+    for i in range(size):
+        for j in range(size):
+            grid[corner1[0] + i, corner1[1] + j] = 1
+    
+    return grid
+
+def fill_separators(grid, start, end):
+    if start[0] == end[0]:
+        for i in range(end[1] - start[1]):
+            grid[start[0], start[1] + i] = 0
+    if start[1] == end[1]:
+        for i in range(end[0] - start[0]):
+            grid[start[0] + i, start[1]] = 0
+    
+    return grid
+
+def draw_timing_patterns(grid):
+    t1 = [(6, 8 + i) for i in range(5)]
+
+    for idx, t in enumerate(t1):
+        grid[t] = 0 if grid[t1[idx - 1]] else 1
+
+    t2 = [(8 + i, 6) for i in range(5)]
+    for idx, t in enumerate(t2):
+        grid[t] = 0 if grid[t2[idx -1]] else 1
+
+    return grid
+
+def fill_format_info(grid, info):
+    for i in range(1, 8):
+        grid[-i, 8] = info[i]
+
+    for i in range(8):
+        grid[8, 13 + i] = info[7 + i]
+
+    for i in range(6):
+        grid[8, i] = info[i]
+    
+    grid[8, 7] = info[i + 1]
+    grid[8, 8] = info[i + 2]
+    grid[7, 8] = info[i + 3]
+
+    for i in range(6):
+        grid[i, 8] = info[- i - 1]
 
 
-class MessageTooLong(Exception):
-    pass
+    return grid
+
+def fill_up_odd(grid, msg_even):
+    c = 0
+    start = 20
+    end = -1
+    step = -1
+    for j in range(20, 5, -2):
+        for i in range(start, end, step):
+            if grid[i, j] == None:
+                grid[i, j] = int(msg_even[c])
+                c += 1
+        if start != 0:
+            start = 0
+            end = 21
+            step = 1
+        else:
+            start = 20
+            end = -1
+            step = -1
+    # can't really explain this
+    start = 0
+    end = 21
+    step = 1
+    for j in range(5, 0, -2):
+        for i in range(start, end, step):
+            if grid[i, j] == None:
+                grid[i, j] = int(msg_even[c])
+                c += 1
+        if start != 0:
+            start = 0
+            end = 21
+            step = 1
+        else:
+            start = 20
+            end = -1
+            step = -1
+    return grid
+
+def fill_up_even(grid, msg_odd):
+    c = 0
+    start = 20
+    end = -1
+    step = -1
+    for j in range(19, 6, -2):
+        for i in range(start, end, step):
+            if grid[i, j] == None:
+                # print(grid[i, j], c)
+                grid[i, j] = int(msg_odd[c])
+                c += 1
+        if start != 0:
+            start = 0
+            end = 21
+            step = 1
+        else:
+            start = 20
+            end = -1
+            step = -1
+
+    for j in range(4, -1, -2):
+        for i in range(start, end, step):
+            if grid[i, j] == None:
+                # print(i, j)
+                grid[i, j] = int(msg_odd[c])
+                c += 1
+        if start != 0:
+            start = 0
+            end = 21
+            step = 1
+        else:
+            start = 20
+            end = -1
+            step = -1
+
+    return grid
 
 
-def gf_multiply(c1, c2):
-    if 0 in [c1, c2]:
-        return 0
-    elif max(c1, c2) > 255:
-        raise ValueError
-    return ANTILOG_LOOKUP[(LOG_LOOKUP[c1] + LOG_LOOKUP[c2]) % 255]
+grid = np.array([None] * 441).reshape([21, 21])
 
+grid = fill_square_border(grid, (0, 0), (6, 6), 1)
+grid = fill_square_border(grid, (14, 0), (20, 6), 1)
+grid = fill_square_border(grid, (0, 14), (6, 20), 1)
 
-def find_cw_lengths(message):
-    length = len(message)
+grid = fill_square_border(grid, (1, 1), (5, 5), 0)
+grid = fill_square_border(grid, (15, 1), (19, 5), 0)
+grid = fill_square_border(grid, (1, 15), (5, 19), 0)
 
-    limits = {}
-    for level in VERSION1:
-        limits[level] = ((VERSION1[level][0] * 8) - (4 + 8)) // 8
+grid = fill_squares(grid, (2, 2), 3)
+grid = fill_squares(grid, (16, 2), 3)
+grid = fill_squares(grid, (2, 16), 3)
 
-    for level in VERSION1:
-        if length <= limits[level]:
-            return VERSION1[level]
+grid = fill_separators(grid, (7, 0), (7, 8))
+grid = fill_separators(grid, (0, 7), (7, 7))
+grid = fill_separators(grid, (7, 13), (7, 21))
+grid = fill_separators(grid, (0, 13), (7, 13))
+grid = fill_separators(grid, (13, 0), (13, 8))
+grid = fill_separators(grid, (13, 7), (21, 7))
 
-    raise MessageTooLong
+grid = draw_timing_patterns(grid)
 
+grid[13, 8] = 1
 
-def expand(binary_str, num_bits=8):
-    prefix = "0" * (num_bits - len(binary_str[2:]))
-    return prefix + binary_str[2:]
+grid = fill_format_info(grid, [0] * 15)
