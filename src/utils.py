@@ -56,6 +56,8 @@ def draw_timing_patterns(grid):
     return grid
 
 def fill_format_info(grid, info):
+    info = [int(i) for i in info]
+
     for i in range(1, 8):
         grid[-i, 8] = info[i]
 
@@ -83,7 +85,8 @@ def fill_up_odd(grid, msg_even):
     for j in range(20, 5, -2):
         for i in range(start, end, step):
             if grid[i, j] == None:
-                grid[i, j] = int(msg_even[c])
+                _mask = ((i + j) % 2 == 0)
+                grid[i, j] = int(msg_even[c]) ^ _mask
                 c += 1
         if start != 0:
             start = 0
@@ -100,7 +103,8 @@ def fill_up_odd(grid, msg_even):
     for j in range(5, 0, -2):
         for i in range(start, end, step):
             if grid[i, j] == None:
-                grid[i, j] = int(msg_even[c])
+                _mask = ((i + j) % 2 == 0)
+                grid[i, j] = int(msg_even[c]) ^ _mask
                 c += 1
         if start != 0:
             start = 0
@@ -120,8 +124,9 @@ def fill_up_even(grid, msg_odd):
     for j in range(19, 6, -2):
         for i in range(start, end, step):
             if grid[i, j] == None:
-                # print(grid[i, j], c)
-                grid[i, j] = int(msg_odd[c])
+                # grid[i, j] = int(msg_odd[c])
+                _mask = ((i + j) % 2 == 0)
+                grid[i, j] = int(msg_odd[c]) ^ _mask
                 c += 1
         if start != 0:
             start = 0
@@ -135,8 +140,10 @@ def fill_up_even(grid, msg_odd):
     for j in range(4, -1, -2):
         for i in range(start, end, step):
             if grid[i, j] == None:
-                # print(i, j)
-                grid[i, j] = int(msg_odd[c])
+                # grid[i, j] = int(msg_odd[c])
+                _mask = ((i + j) % 2 == 0)
+                grid[i, j] = int(msg_odd[c]) ^ _mask
+
                 c += 1
         if start != 0:
             start = 0
@@ -149,30 +156,3 @@ def fill_up_even(grid, msg_odd):
 
     return grid
 
-
-grid = np.array([None] * 441).reshape([21, 21])
-
-grid = fill_square_border(grid, (0, 0), (6, 6), 1)
-grid = fill_square_border(grid, (14, 0), (20, 6), 1)
-grid = fill_square_border(grid, (0, 14), (6, 20), 1)
-
-grid = fill_square_border(grid, (1, 1), (5, 5), 0)
-grid = fill_square_border(grid, (15, 1), (19, 5), 0)
-grid = fill_square_border(grid, (1, 15), (5, 19), 0)
-
-grid = fill_squares(grid, (2, 2), 3)
-grid = fill_squares(grid, (16, 2), 3)
-grid = fill_squares(grid, (2, 16), 3)
-
-grid = fill_separators(grid, (7, 0), (7, 8))
-grid = fill_separators(grid, (0, 7), (7, 7))
-grid = fill_separators(grid, (7, 13), (7, 21))
-grid = fill_separators(grid, (0, 13), (7, 13))
-grid = fill_separators(grid, (13, 0), (13, 8))
-grid = fill_separators(grid, (13, 7), (21, 7))
-
-grid = draw_timing_patterns(grid)
-
-grid[13, 8] = 1
-
-grid = fill_format_info(grid, [0] * 15)

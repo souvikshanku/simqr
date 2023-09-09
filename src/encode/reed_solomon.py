@@ -1,5 +1,5 @@
 from encode.polynomial import GFPolynomial
-from encode.utils import ANTILOG_LOOKUP, expand, find_cw_lengths
+from encode.utils import ANTILOG_LOOKUP, expand, find_cw_lengths, VERSION1
 
 
 def _generator_polynomial(degree):
@@ -32,6 +32,19 @@ def _generate_message_poly(bits):
     return coeffs
 
 
+def _get_ec_level(message):
+    length = len(message)
+    limits = {}
+    for level in VERSION1:
+        limits[level] = ((VERSION1[level][0] * 8) - (4 + 8)) // 8
+
+    for level in VERSION1:
+        if length <= limits[level]:
+            break
+
+    return level
+
+
 def encode(message: str):
     message = [ord(char) for char in message]
     len1, len2 = find_cw_lengths(message)
@@ -53,7 +66,9 @@ def encode(message: str):
 
     return enc_msg
 
-def encode_format_info(ec_level):
+
+def encode_format_info(message):
+    ec_level = _get_ec_level(message)
     ec = {"L": [0, 1], "M": [0, 0], "Q": [1, 1], "H": [1, 0]}
 
     mask = [0, 0, 0]  # Always choose mask pattern 0, kinda cheating.
