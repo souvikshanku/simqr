@@ -8,7 +8,9 @@ Usage
 ------
 ```console
 git clone https://github.com/souvikshanku/simqr.git
-cd simqr/src
+cd simqr
+pip install -r requirements.txt
+cd src
 ```
 ```python
 >>> from qr import draw
