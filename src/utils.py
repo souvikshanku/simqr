@@ -1,6 +1,4 @@
-import numpy as np
-import matplotlib.pyplot as plt
-
+# This probably needs a little bit of refactoring. Not my cleanest code :(
 
 def fill_square_border(grid, corner1, corner2, value=1):
     """
@@ -155,4 +153,3 @@ def fill_up_even(grid, msg_odd):
             step = -1
 
     return grid
-

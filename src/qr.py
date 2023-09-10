@@ -1,7 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-from encode.polynomial import GFPolynomial 
 from encode.reed_solomon import encode, encode_format_info
 from utils import (
     draw_timing_patterns,
