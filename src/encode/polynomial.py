@@ -3,7 +3,7 @@ from encode.utils import gf_multiply
 
 class GFPolynomial:
     def __init__(self, coeffs: list):
-        # All coeffecients are assumed to be in [0, 255]
+        # All coefficients are assumed to be in [0, 255]
         self.degree = len(coeffs) - 1
         self.coeffs = coeffs
 

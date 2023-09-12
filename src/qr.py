@@ -43,8 +43,8 @@ def draw(message):
     grid = fill_format_info(grid, [0] * 15)
 
     enc_msg = encode(message)
-    msg_even = [enc_msg[m]  for m in range(len(enc_msg)) if m % 2 == 0]
-    msg_odd = [enc_msg[m]  for m in range(len(enc_msg)) if m % 2 != 0]
+    msg_even = [enc_msg[m] for m in range(len(enc_msg)) if m % 2 == 0]
+    msg_odd = [enc_msg[m] for m in range(len(enc_msg)) if m % 2 != 0]
 
     grid = fill_up_odd(grid, msg_even)
     grid = fill_up_even(grid, msg_odd)
