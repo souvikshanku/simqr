@@ -56,3 +56,4 @@ def draw(message):
     ax = fig.add_subplot(111)
     ax.axis('off')
     ax.imshow(grid.astype(int), cmap="Greys")
+    plt.show()
