@@ -42,6 +42,13 @@ def gf_multiply(c1, c2):
     return ANTILOG_LOOKUP[(LOG_LOOKUP[c1] + LOG_LOOKUP[c2]) % 255]
 
 
+def gf_power(x, power):
+    result = 1
+    for _ in range(power):
+        result = gf_multiply(result, x)
+    return result
+
+
 def find_cw_lengths(message):
     length = len(message)
 
