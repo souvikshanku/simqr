@@ -78,3 +78,9 @@ class GFPolynomial:
             diff -= 1
 
         return dividend
+
+    def __call__(self, x):
+        eval_value = 0
+        for pow, c in enumerate(self.coeffs[::-1]):
+            eval_value ^= gf_multiply(c, gf_power(x, pow)
+        return eval_value
