@@ -60,7 +60,9 @@ def find_cw_lengths(message):
         if length <= limits[level]:
             return VERSION1[level]
 
-    raise MessageTooLong
+    raise MessageTooLong(
+        "Version 1 QR codes support only upto 17 characters long messages."
+    )
 
 
 def expand(binary_str, num_bits=8):

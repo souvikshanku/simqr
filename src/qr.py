@@ -39,8 +39,7 @@ def draw(message):
 
     grid[13, 8] = 1  # Dark Module
 
-    # dummy format info for now
-    grid = fill_format_info(grid, [0] * 15)
+    grid = fill_format_info(grid, encode_format_info(message))
 
     enc_msg = encode(message)
     msg_even = [enc_msg[m] for m in range(len(enc_msg)) if m % 2 == 0]
@@ -48,9 +47,6 @@ def draw(message):
 
     grid = fill_up_odd(grid, msg_even)
     grid = fill_up_even(grid, msg_odd)
-
-    # real format info, this time
-    grid = fill_format_info(grid, encode_format_info(message))
 
     fig = plt.figure(figsize=(5, 5))
     ax = fig.add_subplot(111)

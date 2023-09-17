@@ -45,7 +45,7 @@ def _get_ec_level(message):
     return level
 
 
-def encode(message: str):
+def encode(message: str) -> str:
     message = [ord(char) for char in message]
     len1, len2 = find_cw_lengths(message)
 
@@ -67,7 +67,7 @@ def encode(message: str):
     return enc_msg
 
 
-def encode_format_info(message):
+def encode_format_info(message: str) -> str:
     ec_level = _get_ec_level(message)
     ec = {"L": [0, 1], "M": [0, 0], "Q": [1, 1], "H": [1, 0]}
 
